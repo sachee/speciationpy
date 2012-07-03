@@ -19,15 +19,23 @@ class Ecosystem:
     def connect(self, edge): # connect the ecosystem to its neighbors #
         i = self.coordinates[0] # i coordinate of position in grid (like matrix coords)
         j = self.coordinates[1] # j coordinate of position in grid (like matrix coords)
+        # this system assures neighbors are sorted according to their coordinates
         if i - 1 >= 0: # if neighbors exist to the left
-            self.neighbors.append((i-1, j))
             if j - 1 >= 0: # if neighbors exist to the above left
                 self.neighbors.append((i-1, j-1))
+            self.neighbors.append((i-1, j))
+            if j + 1 < edge:
+                self.neighbors.append((i-1, j+1))
         if j - 1 >= 0: # if neighbors exist above
             self.neighbors.append((i, j-1))
-            if i + 1 < edge: # if neighbors exist to the above right
-                self.neighbors.append((i+1, j-1))
-                    
+        if j + 1 < edge:
+            self.neighbors.append((i, j+1))
+        if i + 1 < edge:  
+            if j - 1 >= 0:
+                self.neighbors.append((i+1, j-1)) # if neighbors exist to the above right
+            self.neighbors.append((i+1, j))
+            if j + 1 < edge:
+                self.neighbors.append((i+1, j+1)) 
         
     def generate_eco(self, k): # generate an ecosystem with k environmental factors
         eco = []
@@ -37,4 +45,8 @@ class Ecosystem:
 
     def populate(self, carry_cap, loci, SIGMA):
         self.population.initial_pop(carry_cap, loci, self.num_env_fac, self.eco_type, SIGMA)
+
+    
+
+
         
