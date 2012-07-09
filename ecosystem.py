@@ -46,6 +46,9 @@ class Ecosystem:
     def populate(self, carry_cap, loci, SIGMA):
         self.population.initial_pop(carry_cap, loci, self.num_env_fac, self.eco_type, SIGMA)
 
+    def exterminate(): # 'cleans' the ecosystem and removes all individuals
+        pass
+
     
 
 
