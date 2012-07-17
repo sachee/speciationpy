@@ -11,6 +11,7 @@ class Individual:
         self.k = num_env_fac
         self.genome = self.generate_genome()
         self.fitness = self.find_fitness()
+        self.juvenile = True # flag for if individual is juvenile. All inds begin as juveniles
         
 
     def generate_genome(self): # generate an ecosystem with k environmental factors
