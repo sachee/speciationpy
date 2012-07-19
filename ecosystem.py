@@ -8,10 +8,10 @@ import random as rand
 from population import Population
 
 class Ecosystem:
-    def __init__(self, P, coords):
-        self.capacity = P.MAX_CAP*P.SIGMA
-        # number of environmental factors that determines niche types
-        self.eco_type =  self.generate_eco(P.num_env_fac) # type of ecosystem 2**k possible niche types, k long
+    def __init__(self, num_env_fac, SIGMA, MAX_CAP, coords):
+        self.capacity = MAX_CAP*SIGMA
+        self.num_env_fac = num_env_fac # number of environmental factors that determines niche types
+        self.eco_type =  self.generate_eco(self.num_env_fac) # type of ecosystem 2**k possible niche types, k long
         self.coordinates = coords # coordinates of ecosystem's location in nXn grid
         self.neighbors = [] # where the ecosystem is/who it is connected to in the nXn grid
         self.population = Population()
@@ -43,8 +43,8 @@ class Ecosystem:
             eco.append(bool(rand.getrandbits(1)))
         return eco
 
-    def populate(self, P):
-        self.population.initial_pop(P, self.eco_type)
+    def populate(self, carry_cap, loci, SIGMA):
+        self.population.initial_pop(carry_cap, loci, self.num_env_fac, self.eco_type, SIGMA)
 
     def exterminate(): # 'cleans' the ecosystem and removes all individuals
         pass
