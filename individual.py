@@ -4,11 +4,11 @@ import random as rand
 from trait import Trait
 
 class Individual:
-    def __init__(self, num_loci, num_env_fac, eco_type, SIGMA):
-        self.num_loci = num_loci
-        self.sigma = SIGMA # strength of selection for local adaptation
+    def __init__(self, P, eco_type):
+        self.num_loci = P.num_loci
+        self.sigma = P.SIGMA # strength of selection for local adaptation
         self.ecosystem = eco_type # the ecosystem the ind is currently living in
-        self.k = num_env_fac
+        self.k = P.num_env_fac
         self.genome = self.generate_genome()
         self.fitness = self.find_fitness()
         self.juvenile = True # flag for if individual is juvenile. All inds begin as juveniles
