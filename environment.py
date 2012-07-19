@@ -8,29 +8,25 @@ import sys
 from ecosystem import Ecosystem
 import random as rand
 from copy import deepcopy
-SIGMA = .356 # to be put in main func later
-MAX_CAP = 500 #to be in main func later # carrying capacity
-num_env_fac = 3
-grid_size = 3
-loci = 3
-dispersion_radius = 1
+from parameters import Parameters
+
 
 
 class Environment:
-    def __init__(self, grid_size, loci, num_env_fac):
+    def __init__(self, P):
         self.grid = []
-        self.grid_size = grid_size
-        self.generate(loci, num_env_fac)
+        self.grid_size = P.grid_size
+        self.generate(P)
         
-    def generate(self, loci, num_env_fac): # generate environment and populate with ecosystems #
-        for i in range(0, grid_size): # x coords
+    def generate(self, P): # generate environment and populate with ecosystems #
+        for i in range(0, P.grid_size): # x coords
             self.grid.append([]) # build the rows
-            for j in range(0, grid_size): # y coords
-                eco = Ecosystem(num_env_fac, SIGMA, MAX_CAP, (i, j)) # create an ecosystem at the plot
-                eco.connect(grid_size) # connect the ecosystem to its neighbors
+            for j in range(0, P.grid_size): # y coords
+                eco = Ecosystem(P, (i, j)) # create an ecosystem at the plot
+                eco.connect(P.grid_size) # connect the ecosystem to its neighbors
                 self.grid[i].append(eco) # put ecosystem into environment grid
                 if( i == 0 and j == 0): # this is the initial founder square with the initial 500 inds
-                    eco.populate(MAX_CAP, loci, SIGMA)
+                    eco.populate(P)
 
     def disperse(self):
         dispersed_grid = deepcopy(self.grid) # this will be the resulting grid after dispersal
@@ -48,7 +44,13 @@ class Environment:
                     
         self.grid = dispersed_grid
 
-                       
+    def mate(self):
+        for env in self.grid:
+            for eco in env:
+                for pop in eco:
+                    pop.selection(P.MAX_CAP) # perform selection
+                    pop.mate() # the remaining individuals get to mate
+
     def find_prefs(self, eco, ind): # find the preferences for a specific ecosystem of an individual
         preferences = []
         for coords in eco.neighbors:
@@ -121,7 +123,8 @@ class Environment:
 
 
 def main():
-    E = Environment(grid_size, loci, num_env_fac)
+    P = Parameters() # create parameter set
+    E = Environment(P)
     E.print_env()
     generations = 5
     for generation in range(generations):
