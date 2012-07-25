@@ -14,7 +14,7 @@ class Ecosystem:
         self.eco_type =  self.generate_eco(P.num_env_fac) # type of ecosystem 2**k possible niche types, k long
         self.coordinates = coords # coordinates of ecosystem's location in nXn grid
         self.neighbors = [] # where the ecosystem is/who it is connected to in the nXn grid
-        self.population = Population()
+        self.population = Population(P.b)
 
     def connect(self, edge): # connect the ecosystem to its neighbors #
         i = self.coordinates[0] # i coordinate of position in grid (like matrix coords)
@@ -49,7 +49,3 @@ class Ecosystem:
     def exterminate(): # 'cleans' the ecosystem and removes all individuals
         pass
 
-    
-
-
-        

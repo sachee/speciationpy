@@ -8,11 +8,11 @@ from individual import Individual
 import random as rand
 
 class Population:
-    def __init__(self):
+    def __init__(self, b):
         self.members = []
         self.size = 0
         #self.carry_cap = 0
-        self.b = 4 # average number of offspring per female
+        self.b = b # average number of offspring per female
         self.num_juveniles = self.find_num_juveniles()
 
     def initial_pop(self, P, eco_type): # initial pop of adults
@@ -49,36 +49,36 @@ class Population:
                 total+=1
 
 
-    def poisson_dist(N):
-        L = math.e**(-1)*N
+    def poisson_dist(expected_value, N): # pass in the expected number (lamda) and the length or number to be selected from
+        L = math.e**((-1)*expected_value)
         k = 1
         p = 1
         p*= rand.random() # initial p
         while p > L:
             k+=1
             p*= rand.random()
-        return k - 1
+        return (k - 1)*N
          
 
 
 
-    def mate(self):
+    def mate(self, P):
         for female in self.members: # each ind in the pop is a female once
             male = rand.choice(self.members)
             while male == female: # make sure the inds are mating with themselves!
                 male = rand.choice(self.members)
-                num_offspring = poisson_dist(self.b) # find number of offspring based on avg offspring
+                num_offspring = poisson_dist(self.b, 1) # find number of offspring based on avg offspring
                 for _ in range(num_offspring):
-                    self.mutation()
-                    self.crossover()
+                    self.create_offspring(P, female, male)
             #mutation
             #crossover
 
-    def create_offspring(self):
-        pass
+    def create_offspring(self, parent1, parent2):
+        offspring = Individual(P, parent1.eco_type)
+        offspring.crossover(parent1.genome, parent2.genome)
+        num_mutations = poisson_dist(10**mutation_rate, offspring.genome_size())
+        offspring.mutation(num_mutations) # check to mutate the offspring's genome (small chance of mutation)
 
-    def mutation(self):
-        pass
 
-    def crossover(self):
-        pass
+  #  | 0 | 1 | 2 | 3 | 4 |
+  #  0   1   2   3   4   5
