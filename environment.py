@@ -49,8 +49,11 @@ class Environment:
     def mate(self, P):
         for env in self.grid:
             for eco in env:
-                    eco.population.selection(P.MAX_CAP) # perform selection
-                    eco.population.mate(P) # the remaining individuals get to mate
+                eco.population.selection(P.MAX_CAP) # perform selection
+                new_pop = deepcopy(eco.population.members) # to be the new population with new juveniles
+                eco.population.mate(P, new_pop) # the remaining individuals get to mate
+                    # TODO add offspring to population
+
 
     def find_prefs(self, eco, ind): # find the preferences for a specific ecosystem of an individual
         preferences = []
@@ -120,6 +123,12 @@ class Environment:
             p*= rand.random()
         return (k - 1)*N
 
+    def count_total_species(self):
+        total_species = 0
+        for env in self.grid:
+            for eco in env:
+                total_species += eco.population.species_in_pop()
+        return total_species
 
     def print_env(self):
         #print '-------' * grid_size
@@ -150,15 +159,25 @@ class Environment:
 
 
 def main():
+    print 'Started'
     P = Parameters() # create parameter set
     E = Environment(P)
+    # species_types = []
     E.print_env()
-    generations = 10
+    generations = 51
+    save_generation = 10 # save every X generations
     for generation in range(generations):
-        E.disperse() # individuals disperse to neighboring ecosystems
-        E.mate(P) # individuals mate
-        E.eco_extinction(P.extinction_rate, P.num_env_fac) #ecosystems and inviduals go have a probability of going extinct
-        E.print_env()
 
+        # print 'dispersal'
+        E.disperse() # individuals disperse to neighboring ecosystems
+        # print 'mating'
+        E.mate(P) # individuals mate
+        # print 'extinction?'
+        E.eco_extinction(P.extinction_rate, P.num_env_fac) #ecosystems and inviduals go have a probability of going extinct
+        if generation % save_generation == 0:
+            print generation, ' Inds a part of a species: ', E.count_total_species() 
+            E.print_env()
+            
+    print 'Finished.'
 if __name__ == "__main__":
     main()

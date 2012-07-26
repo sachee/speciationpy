@@ -64,23 +64,32 @@ class Population:
 
 
 
-    def mate(self, P):
-        for female in self.members: # each ind in the pop is a female once
-            male = rand.choice(self.members)
-            while male == female: # make sure the inds are mating with themselves!
+    def mate(self, P, population):
+        if len(self.members) > 1: # you can't mate if you're the only one!
+            for female in self.members: # each ind in the pop is a female once
                 male = rand.choice(self.members)
+                while male == female: # make sure the inds are mating with themselves!
+                    male = rand.choice(self.members)
                 num_offspring = self.poisson_dist(self.b, 1) # find number of offspring based on avg offspring
+                i=0
                 for _ in range(num_offspring):
-                    self.create_offspring(P, female, male)
-            #mutation
-            #crossover
+                    i+=1
+                    offspring = self.create_offspring(P, female, male) # crossover and mutation
+                    population.append(offspring) # add the new offspring to the population
 
     def create_offspring(self, P, parent1, parent2):
         offspring = Individual(P, parent1.eco_type)
         offspring.crossover(parent1.genome, parent2.genome)
         num_mutations = self.poisson_dist(10**((-1)*P.mutation_rate), offspring.genome_size())
         offspring.mutation(num_mutations) # check to mutate the offspring's genome (small chance of mutation)
+        return offspring
 
+    def species_in_pop(self):
+        total_species_in_pop = 0
+        for ind in self.members:
+            if ind.is_species():
+                total_species_in_pop += 1
+        return total_species_in_pop
 
   #  | 0 | 1 | 2 | 3 | 4 |
   #  0   1   2   3   4   5

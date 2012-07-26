@@ -11,7 +11,7 @@ class Individual:
         self.eco_type = eco_type # the ecosystem the ind is currently living in
         self.k = P.num_env_fac
         self.genome = Genome(self.k, P.num_loci)
-        self.fitness = self.find_fitness()
+        self.fitness = self.find_fitness(self.eco_type)
         self.juvenile = True # flag for if individual is juvenile. All inds begin as juveniles
         
 
@@ -32,23 +32,22 @@ class Individual:
         return self.genome.length*self.k*self.num_loci
 
     def convert(self, trait): # converts genome to format that can interact with ecosystem features
-        total_on = 0 # counter for number of bits turned on i.e. number of 1's in the trait
-        for i in range(self.num_loci):
-            if trait.loci[i]:
-                total_on += 1
+       # counter for number of bits turned on i.e. number of 1's in the trait
+        total_on = sum(trait.loci)
         return total_on/self.num_loci
 
-    
-    def find_fitness(self):
+    # ''' finds the how strong an individual's fitness is ''' #
+    def find_fitness(self, eco_type):
         w = [] # fitness component matrix
         overall_fitness = 1
-        theta = self.eco_type
+        theta = self.eco_type # an ecological niche
         x = self.genome.eco #first characteristic controls ecology
         for i in range(self.k):
             w.append(np.exp( ( ( -(self.convert(x[i]) - theta[i]) )**2 )/(2*self.sigma**2) ) )
             overall_fitness *= w[i]
         return overall_fitness
 
+    # ''' finds how strongly an individual prefers a niche ''' #
     def find_preference(self, eco_type):
         p = [] # preference component matrix
         overall_pref = 1
@@ -61,6 +60,13 @@ class Individual:
                 p.append(.5 - .99*(self.convert(y[i]) - .5)) # where a[i] = .99 i.e. possible strength is .99, - when theta == 0
             overall_pref *= p[i]
         return overall_pref
+
+    def is_species(self):
+        for i in range(self.k):
+            if sum(self.genome.eco[i].loci) != sum(self.genome.pref[i].loci):
+                return False
+            return True
+
 
     # ''' find the points at which we will perform crossover ''' #
     def find_crosspoints(self):
@@ -87,8 +93,7 @@ class Individual:
 
 
     def mutation(self, num_mutations): # use genomes of parents
-        # print 'in mutation function'
-        if num_mutations != 0:
+        if num_mutations > 0:
             genome_length = self.genome_size()
             chosen = set() # so we get distinct numbers, and don't mutate the same bit twice!
             while len(chosen) != num_mutations:
@@ -96,6 +101,7 @@ class Individual:
             bit_num = 0 # used to determine the 'number' of the bit
             self.mutate_traits(self.genome.eco, bit_num, chosen)
             self.mutate_traits(self.genome.pref, bit_num, chosen)
+
 
     def mutate_traits(self, characteristic, bit_num, chosen):
         for trait in range(len(characteristic)):

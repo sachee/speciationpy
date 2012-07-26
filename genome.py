@@ -14,7 +14,7 @@ class Genome:
 
     def generate(self, num_loci):
         for i in range(self.k): # randomly choose a niche and whether it is "on" or "off"
-            self.eco.append([]) # the 2k characteristics; ecological and preference
-            self.pref.append([])
-            self.eco[i] = Trait(num_loci)
-            self.pref[i] = Trait(num_loci)
+            #self.eco.append([]) # the 2k characteristics; ecological and preference
+            #self.pref.append([])
+            self.eco.append(Trait(num_loci))
+            self.pref.append(Trait(num_loci))

@@ -37,7 +37,7 @@ class Ecosystem:
             if j + 1 < edge:
                 self.neighbors.append((i+1, j+1)) 
         
-    def generate_eco(self, k): # generate an ecosystem with k environmental factors
+    def generate_eco(self, k): # generate an ecosystem with k environmental factors, i.e. ecological niche
         eco = []
         for _ in range(k): # randomly choose a niche and whether it is "on" or "off"
             eco.append(bool(rand.getrandbits(1)))
@@ -46,7 +46,7 @@ class Ecosystem:
     def populate(self, P):
         self.population.initial_pop(P, self.eco_type)
 
-    def exterminate(num_env_fac): # 'cleans' the ecosystem and removes all individuals
+    def exterminate(self, num_env_fac): # 'cleans' the ecosystem and removes all individuals
         self.population.members = [] # kill off all individuals in the ecosystem
         self.eco_type = self.generate_eco(num_env_fac)
 
