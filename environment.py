@@ -5,6 +5,7 @@
 from __future__ import division
 import numpy as np
 import sys
+import math
 from ecosystem import Ecosystem
 import random as rand
 from copy import deepcopy
@@ -12,10 +13,11 @@ from parameters import Parameters
 
 
 
+
 class Environment:
     def __init__(self, P):
         self.grid = []
-        self.grid_size = P.grid_size
+        self.grid_size = P.grid_size # a grid_sizeXgrid_size grid, i.e. nXn grid
         self.generate(P)
         
     def generate(self, P): # generate environment and populate with ecosystems #
@@ -44,12 +46,11 @@ class Environment:
                     
         self.grid = dispersed_grid
 
-    def mate(self):
+    def mate(self, P):
         for env in self.grid:
             for eco in env:
-                for pop in eco:
-                    pop.selection(P.MAX_CAP) # perform selection
-                    pop.mate() # the remaining individuals get to mate
+                    eco.population.selection(P.MAX_CAP) # perform selection
+                    eco.population.mate(P) # the remaining individuals get to mate
 
     def find_prefs(self, eco, ind): # find the preferences for a specific ecosystem of an individual
         preferences = []
@@ -92,6 +93,32 @@ class Environment:
                 eco.population.members = []
         return grid
                 
+    def eco_extinction(self, extinction_rate, num_env_fac):
+        total_ecosystems = self.grid_size*self.grid_size
+        num_extinct = self.find_num_extinct(extinction_rate, total_ecosystems) # find the number of ecosystems that will go extinct
+        if num_extinct > 0:
+            chosen = set() # a set of the chosen ecosystems to go extinct
+            while len(chosen) != num_extinct: # get distinct ecos
+                chosen.add(rand.randrange(total_ecosystems))
+            eco_num = 0 # used to determine the 'number' of the ecosystem
+            for env in self.grid:
+                for eco in env:
+                    if eco_num in chosen: # if the eco number matches a number in chosen, exterminate!
+                        eco.exterminate()
+                    eco_num += 1
+
+
+        
+    # ''' finds the number of ecosystems to go extinct ''' #            
+    def find_num_extinct(self, expected_value, N):
+        L = math.e**((-1)*expected_value)
+        k = 1
+        p = 1
+        p*= rand.random() # initial p
+        while p > L:
+            k+=1
+            p*= rand.random()
+        return (k - 1)*N
 
 
     def print_env(self):
@@ -126,9 +153,11 @@ def main():
     P = Parameters() # create parameter set
     E = Environment(P)
     E.print_env()
-    generations = 5
+    generations = 10
     for generation in range(generations):
-        E.disperse()
+        E.disperse() # individuals disperse to neighboring ecosystems
+        E.mate(P) # individuals mate
+        E.eco_extinction(P.extinction_rate, P.num_env_fac) #ecosystems and inviduals go have a probability of going extinct
         E.print_env()
 
 if __name__ == "__main__":

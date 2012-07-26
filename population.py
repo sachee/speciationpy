@@ -4,6 +4,7 @@
 
 from __future__ import division
 import numpy as np
+import math
 from individual import Individual
 import random as rand
 
@@ -47,9 +48,10 @@ class Population:
         for ind in self.members:
             if ind.juvenile: # if individual is a juvenile
                 total+=1
+        return total
 
 
-    def poisson_dist(expected_value, N): # pass in the expected number (lamda) and the length or number to be selected from
+    def poisson_dist(self, expected_value, N): # pass in the expected number (lamda) and the length or number to be selected from
         L = math.e**((-1)*expected_value)
         k = 1
         p = 1
@@ -67,16 +69,16 @@ class Population:
             male = rand.choice(self.members)
             while male == female: # make sure the inds are mating with themselves!
                 male = rand.choice(self.members)
-                num_offspring = poisson_dist(self.b, 1) # find number of offspring based on avg offspring
+                num_offspring = self.poisson_dist(self.b, 1) # find number of offspring based on avg offspring
                 for _ in range(num_offspring):
                     self.create_offspring(P, female, male)
             #mutation
             #crossover
 
-    def create_offspring(self, parent1, parent2):
+    def create_offspring(self, P, parent1, parent2):
         offspring = Individual(P, parent1.eco_type)
         offspring.crossover(parent1.genome, parent2.genome)
-        num_mutations = poisson_dist(10**mutation_rate, offspring.genome_size())
+        num_mutations = self.poisson_dist(10**((-1)*P.mutation_rate), offspring.genome_size())
         offspring.mutation(num_mutations) # check to mutate the offspring's genome (small chance of mutation)
 
 

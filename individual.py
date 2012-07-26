@@ -8,7 +8,7 @@ class Individual:
     def __init__(self, P, eco_type):
         self.num_loci = P.num_loci
         self.sigma = P.SIGMA # strength of selection for local adaptation
-        self.ecosystem = eco_type # the ecosystem the ind is currently living in
+        self.eco_type = eco_type # the ecosystem the ind is currently living in
         self.k = P.num_env_fac
         self.genome = Genome(self.k, P.num_loci)
         self.fitness = self.find_fitness()
@@ -29,7 +29,7 @@ class Individual:
 #        return (ecological_chars, preference_chars) # the entire genome
 
     def genome_size(self):
-        return len(self.genome)*self.k*self.num_loci
+        return self.genome.length*self.k*self.num_loci
 
     def convert(self, trait): # converts genome to format that can interact with ecosystem features
         total_on = 0 # counter for number of bits turned on i.e. number of 1's in the trait
@@ -42,17 +42,17 @@ class Individual:
     def find_fitness(self):
         w = [] # fitness component matrix
         overall_fitness = 1
-        theta = self.ecosystem
+        theta = self.eco_type
         x = self.genome.eco #first characteristic controls ecology
         for i in range(self.k):
             w.append(np.exp( ( ( -(self.convert(x[i]) - theta[i]) )**2 )/(2*self.sigma**2) ) )
             overall_fitness *= w[i]
         return overall_fitness
 
-    def find_preference(self, ecosystem_niche):
+    def find_preference(self, eco_type):
         p = [] # preference component matrix
         overall_pref = 1
-        theta = ecosystem_niche # the set of environmental factors that together create an ecological niche
+        theta = eco_type # the set of environmental factors that together create an ecological niche
         y = self.genome.pref # second characteristic controls preference
         for i in range(self.k):
             if theta[i] == 1:
@@ -87,18 +87,20 @@ class Individual:
 
 
     def mutation(self, num_mutations): # use genomes of parents
+        # print 'in mutation function'
         if num_mutations != 0:
-            length = self.genome_size()
+            genome_length = self.genome_size()
             chosen = set() # so we get distinct numbers, and don't mutate the same bit twice!
             while len(chosen) != num_mutations:
-                chosen.add(rand.randrange(length)) # choose a random bit to 'mutate'
-            new_genome = deepcopy(self.genome) # so make a copy to be the new genome
-            bit_num = 0
-            for char in self.genome: #characteristic; either eco or pref
-                for trait in range(len(char)):
-                    for locus in range(trait):
-                        if bit_num in chosen: # if the bit we want to mutate is there
-                            bit = self.genome.char[trait][locus] # assign to variable for readability purposes
-                            self.genome.char[trait][locus] = not bit # locus = not locus
-                            i+=1
-                            bit_num+=1
+                chosen.add(rand.randrange(genome_length)) # choose a random bit to 'mutate'
+            bit_num = 0 # used to determine the 'number' of the bit
+            self.mutate_traits(self.genome.eco, bit_num, chosen)
+            self.mutate_traits(self.genome.pref, bit_num, chosen)
+
+    def mutate_traits(self, characteristic, bit_num, chosen):
+        for trait in range(len(characteristic)):
+            for locus in range(trait):
+                if bit_num in chosen: # if the bit we want to mutate is there
+                    bit = characteristic[trait].loci[locus] # assign to variable for readability purposes
+                    characteristic[trait].loci[locus] = not bit # locus = not locus
+                    bit_num += 1

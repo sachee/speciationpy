@@ -46,6 +46,7 @@ class Ecosystem:
     def populate(self, P):
         self.population.initial_pop(P, self.eco_type)
 
-    def exterminate(): # 'cleans' the ecosystem and removes all individuals
-        pass
+    def exterminate(num_env_fac): # 'cleans' the ecosystem and removes all individuals
+        self.population.members = [] # kill off all individuals in the ecosystem
+        self.eco_type = self.generate_eco(num_env_fac)
 

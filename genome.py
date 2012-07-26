@@ -9,6 +9,8 @@ class Genome:
         self.eco = [] # ecological characteristics
         self.k = k
         self.generate(num_loci)
+        self.chars = (self.pref, self.eco) #characteristics in a tuple
+        self.length = len(self.chars)
 
     def generate(self, num_loci):
         for i in range(self.k): # randomly choose a niche and whether it is "on" or "off"
