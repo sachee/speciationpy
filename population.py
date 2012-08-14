@@ -24,6 +24,8 @@ class Population:
             self.size+=1
         #self.carry_cap = carry_cap
 
+    def pop_size(self):
+        return len(self.members)
     # ''' select individuals that will survive to the age of reproduction ''' #
     def selection(self, MAX_CAP):
         N = self.find_num_juveniles()

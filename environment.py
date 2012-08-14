@@ -6,6 +6,7 @@ from __future__ import division
 import numpy as np
 import sys
 import math
+import json
 from ecosystem import Ecosystem
 import random as rand
 from copy import deepcopy
@@ -130,6 +131,19 @@ class Environment:
                 total_species += eco.population.species_in_pop()
         return total_species
 
+    def count_total_inds(self):
+        total_inds = 0
+        for env in self.grid:
+            for eco in env:
+                total_inds += eco.population.pop_size()
+        return total_inds
+
+    def are_all_inds_extinct(self):
+        print 'Not extinct: ', self.count_total_inds()
+        if self.count_total_inds() == 0:
+            return True
+        return False
+
     def print_env(self):
         #print '-------' * grid_size
         for env in self.grid:
@@ -157,8 +171,31 @@ class Environment:
                 print
         print
 
+    def json_dump(self, f):
+        environment = {} # dictionary with the grid and the dimensions of the grid
+        grid = []
+        for env in self.grid:
+            for eco in env:
+                eco_dict = {} # stores information for each ecosystem/niche
+                eco_dict['number'] = eco.population.pop_size()
+                eco_dict['color']  = "#"
+                grid.append(eco_dict)
+        environment['grid'] = grid
+        environment['grid_size'] = self.grid_size
+
+        json.dump([environment], f)
+
+        
+
+
+
+
+
 
 def main():
+    f = open('C:\Users\princessruto\Documents\GitHub\speciationpy\grid_output.json', 'a') # open file to dump to
+    f.write('{') # json object beginning
+    
     print 'Started'
     P = Parameters() # create parameter set
     E = Environment(P)
@@ -175,8 +212,20 @@ def main():
         # print 'extinction?'
         E.eco_extinction(P.extinction_rate, P.num_env_fac) #ecosystems and inviduals go have a probability of going extinct
         if generation % save_generation == 0:
-            print generation, ' Inds a part of a species: ', E.count_total_species() 
+            print generation, ' Inds a part of a species: ', E.count_total_species(), "Inds: ", E.count_total_inds() 
             E.print_env()
+
+            E.json_dump(f) # dump environment snapshot
+
+            # check for extinction
+            if E.are_all_inds_extinct():
+                f.write('}') # json object ending
+                f.close()
+                sys.exit()
+            f.write(",") # don't write this if all inds are extinct
+
+    f.close()
+
             
     print 'Finished.'
 if __name__ == "__main__":

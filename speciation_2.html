@@ -1,0 +1,54 @@
+ <html>                                                                  
+ <head>                                                                  
+ <script type="text/javascript" src="jquery-1.7.2.min.js"></script>                                            
+ <script type="text/javascript">
+  $.ajax({
+	  	url:'grid_output.json', 
+	  	dataType: 'json',
+	  	success: function(boards) {
+		  	alert("YAY!");
+		  	//var items = [];
+		  	// for(board in boards){
+		  	// 	for(i=0; i<2; i++){
+		  	// 		if (i == 1){
+		  	// 			var grid_size = board[1]
+		  	// 		}
+		  	// 		else{
+		  	// 			var generation_board = board[0] // this is a dictionary of ecosystems
+		  	// 		}
+		  	// 	}
+		  	// }
+
+		  	// $.each(data, function(index, board_data){
+
+		  	// });
+			// $.each(data, function(key, val) {
+			// 	items.push('<li id="' + key + '">' + val + '</li>');
+			// });
+
+			// $('<ul/>', {
+			// 	'class': 'my-new-list',
+			// 	html: items.join('')
+			// }).appendTo('body');
+		},
+		error:function(){
+        	alert("Error");
+     	},
+  });
+  
+
+  </script>                                                          
+ </head>  
+
+
+ <body>  
+ Body time 
+ <div class="my-new-list"></div>
+ 	<!-- <div id="result"></div>                                                                -->
+   <!-- we will add our HTML content here -->        
+  <!-- <a href="">hello</a> -->
+
+
+ </body>                                                                 
+ </html>
+
